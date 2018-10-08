@@ -1,37 +1,101 @@
-from tkinter import *
+import sys
+import time
+from PyQt5 import QtCore, QtGui, uic
+from PyQt5 import QtCore, QtGui, QtWidgets
+from bs4 import BeautifulSoup
+from xlwt import *
+import requests
+ 
+qtCreatorFile = "untitled.ui" # Enter file here.
+ 
+Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
+ 
+class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        QtWidgets.QMainWindow.__init__(self)
+        Ui_MainWindow.__init__(self)
+        self.setupUi(self)
 
-top=Tk()
-top.wm_title("菜单")
-top.geometry("400x300+300+100")
+        now_day = time.strftime("%Y-%m-%d", time.localtime())
+        self.dateEdit.setDate(QtCore.QDate.fromString(now_day, 'yyyy-MM-dd'))
 
-# 创建一个菜单项，类似于导航栏
-menubar=Menu(top)
+        self.btnManualOpen.clicked.connect(self.CalculateTax)
 
-# 创建菜单项
-fmenu1=Menu(top)
-for item in ['新建','打开','保存','另存为']:
-    # 如果该菜单时顶层菜单的一个菜单项，则它添加的是下拉菜单的菜单项。
-    fmenu1.add_command(label=item)
+    def CalculateTax(self):
+        yyyy = self.dateEdit.sectionText(self.dateEdit.sectionAt(0))
+        mm=self.dateEdit.sectionText(self.dateEdit.sectionAt(1))
+        dd=self.dateEdit.sectionText(self.dateEdit.sectionAt(2))
+        datestr=yyyy+'-'+mm+'-'+dd
 
-fmenu2=Menu(top)
-for item in ['复制','粘贴','剪切']:
-    fmenu2.add_command(label=item)
 
-fmenu3=Menu(top)
-for item in ['默认视图','新式视图']:
-    fmenu3.add_command(label=item)
+        book = Workbook() #创建一个Excel
+        sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
+        sheet1.write(0,0,'期数')
+        sheet1.write(0,1,'时间')
+        sheet1.write(0,2,'号码1')
+        sheet1.write(0,3,'号码2')
+        sheet1.write(0,4,'号码3')
+        sheet1.write(0,5,'号码4')
+        sheet1.write(0,6,'号码5')
+        sheet1.write(0,7,'号码6')
+        sheet1.write(0,8,'号码7')
+        sheet1.write(0,9,'号码8')
+        sheet1.write(0,10,'号码9')
+        sheet1.write(0,11,'号码10')
 
-fmenu4=Menu(top)
-for item in ["版权信息","其他说明"]:
-    fmenu4.add_command(label=item)
+        url="https://www.1396j.com/pk10/kaijiang?date="+datestr
+        soup=BeautifulSoup(get(url))
+        for index,item in enumerate(soup.select('#history tbody tr')):
+            print(index)
+            id= item.find("i", class_="font_gray666").string
+            sheet1.write(index+1,0,id)
+            date= item.find("i", class_="font_gray999").string
+            sheet1.write(index+1,1,date)
+            numstr=''
+            listnum=[]
+            count=0
+            for index2,item2 in enumerate(item.find("div", class_="number_pk10").children):
+                numstr+=item2.string.strip()
+                if item2.string.strip()!='':
+                    listnum.append(item2.string.strip())
+                    style = getColorStyle(int(item2.string.strip()))
+                    sheet1.write(index+1,count+2,item2.string.strip(),style=style)
+                    count+=1
+            print(listnum)
+        book.save('new.xls')
 
-# add_cascade 的一个很重要的属性就是 menu 属性，它指明了要把那个菜单级联到该菜单项上，
-# 当然，还必不可少的就是 label 属性，用于指定该菜单项的名称
-menubar.add_cascade(label="文件",menu=fmenu1)
-menubar.add_cascade(label="编辑",menu=fmenu2)
-menubar.add_cascade(label="视图",menu=fmenu3)
-menubar.add_cascade(label="关于",menu=fmenu4)
+def get(url):
+    res = requests.get(url)
+    res.encoding = 'utf-8'
+    return res.text
 
-# 最后可以用窗口的 menu 属性指定我们使用哪一个作为它的顶层菜单
-top['menu']=menubar
-top.mainloop()
+def getColorStyle(color):
+    colors = {
+        0 : None,
+        1 : 'yellow',
+        2 : 'blue',
+        3 : 'gray_ega',
+        4 : 'orange',
+        5 : 'dark_blue_ega',
+        6 : 'purple_ega',
+        7 : 'gray25',
+        8 : 'red',
+        9 : 'dark_red_ega',
+        10 : 'green'
+    }
+    style = XFStyle()
+    fnt = Font()                        # 创建一个文本格式，包括字体、字号和颜色样式特性                              
+    fnt.name = u'微软雅黑'                # 设置其字体为微软雅黑                                 
+    fnt.colour_index = 1                # 设置其字体颜色             
+    style.font = fnt  
+    pattern = Pattern()
+    pattern.pattern = Pattern.SOLID_PATTERN
+    pattern.pattern_fore_colour = Style.colour_map[colors.get(color,None)]
+    style.pattern = pattern
+    return style
+
+if __name__ == "__main__":
+    app =QtWidgets.QApplication(sys.argv)
+    window = MyApp()
+    window.show()
+    sys.exit(app.exec_())

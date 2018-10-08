@@ -40,7 +40,6 @@ def getColorStyle(color):
 
     pattern = Pattern()
     pattern.pattern = Pattern.SOLID_PATTERN
-    #pattern.pattern_fore_colour = Style.colour_map['yellow'] #设置单元格背景色为黄色
     pattern.pattern_fore_colour = Style.colour_map[colors.get(color,None)]
     style.pattern = pattern
     return style
@@ -91,7 +90,3 @@ if __name__ == '__main__':
                 count+=1
         print(listnum)
     book.save('new.xls')
-
-    
-
-    

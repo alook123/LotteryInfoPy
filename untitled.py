@@ -6,6 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 import sys
+import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Form(object):
@@ -41,6 +42,8 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label.setText(_translate("Form", "日期"))
+        now_day = time.strftime("%Y-%m-%d", time.localtime())
+        self.dateEdit.setDate(QtCore.QDate.fromString(now_day, 'yyyy-MM-dd'))
         self.btnManualOpen.setText(_translate("Form", "根据日期手动生成并打开"))
         self.cbAutoStart.setText(_translate("Form", "开机启动"))
         self.btnAutoDir.setText(_translate("Form", "查看自动生成文件夹"))
