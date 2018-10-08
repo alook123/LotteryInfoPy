@@ -5,7 +5,7 @@
 # Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
-
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Form(object):
@@ -35,6 +35,8 @@ class Ui_Form(object):
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
+        Form.show()
+
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
@@ -42,4 +44,12 @@ class Ui_Form(object):
         self.btnManualOpen.setText(_translate("Form", "根据日期手动生成并打开"))
         self.cbAutoStart.setText(_translate("Form", "开机启动"))
         self.btnAutoDir.setText(_translate("Form", "查看自动生成文件夹"))
+
+if __name__ == "__main__":
+    app =QtWidgets.QApplication(sys.argv)
+    widget =QtWidgets.QWidget(None)
+    Ui_Form().setupUi(widget)
+    sys.exit(app.exec_())
+    pass
+
 
