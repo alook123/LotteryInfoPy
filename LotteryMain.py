@@ -6,16 +6,16 @@ from bs4 import BeautifulSoup
 from xlwt import *
 from common import get,getColorStyle
 from configparser import ConfigParser
-cfg = ConfigParser()
-cfg.read('config.ini')
-excelPath=cfg.get('path','excelPath')
 
 qtCreatorFile = "untitled.ui" # Enter file here.
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
-
+cfg = ConfigParser()
+cfg.read('config.ini')
 
  
 class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
+    excelPath=''
+    autoexcelpath=''
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
@@ -24,12 +24,19 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
         now_day = time.strftime("%Y-%m-%d", time.localtime())
         self.dateEdit.setDate(QtCore.QDate.fromString(now_day, 'yyyy-MM-dd'))
         self.btnSetDir.clicked.connect(self.SetDir)
+        self.btnAutoDir.clicked.connect(self.LookDir)
         self.btnManualOpen.clicked.connect(self.LookExcelByDate)
+        self.excelPath=cfg.get('path','excelPath')
+        self.autoexcelpath=cfg.get('path','autoexcelpath')
+
+    def LookDir(self):
+        path = os.path.abspath(self.autoexcelpath)
+        os.system("explorer.exe "+path)
 
     def SetDir(self):
         directory1 = QtWidgets.QFileDialog.getExistingDirectory(self,"选取文件夹","./") #起始路径
-        self.excelPath=directory1
-        cfg.set('path','excelPath',self.excelPath)
+        self.autoexcelpath=directory1
+        cfg.set('path','autoexcelpath',self.autoexcelpath)
         # write to file
         with open("config.ini","w+") as f:
             cfg.write(f)
