@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>542</width>
-    <height>194</height>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>20</y>
+     <y>22</y>
      <width>72</width>
      <height>15</height>
     </rect>
@@ -49,17 +49,19 @@
     <string>根据日期手动生成并打开</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="cbAutoStart">
+
+
+   <widget class="QPushButton" name="btnSetDir">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>70</y>
-     <width>91</width>
-     <height>19</height>
+     <width>131</width>
+     <height>28</height>
     </rect>
    </property>
    <property name="text">
-    <string>开机启动</string>
+    <string>设置保存文件夹</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btnAutoDir">
@@ -75,19 +77,7 @@
     <string>查看自动生成文件夹</string>
    </property>
   </widget>
-  <widget class="QProgressBar" name="progressBar">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>140</y>
-     <width>491</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>24</number>
-   </property>
-  </widget>
+ 
  </widget>
  <resources/>
  <connections/>
