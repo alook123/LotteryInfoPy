@@ -113,6 +113,14 @@ dmypy.json
 #myconfig
 Config.ini
 
+#vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+
 #忽略文件夹
 .vscode
 files
