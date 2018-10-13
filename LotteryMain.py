@@ -4,6 +4,7 @@ import time
 from PyQt5 import QtCore, QtGui, QtWidgets,uic
 from bs4 import BeautifulSoup
 from xlwt import *
+from xlrd import *
 from common import get,getColorStyle
 from configparser import ConfigParser
 
@@ -28,6 +29,21 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.btnManualOpen.clicked.connect(self.LookExcelByDate)
         self.excelPath=cfg.get('path','excelPath')
         self.autoexcelpath=cfg.get('path','autoexcelpath')
+
+        if not os.path.exists(excelPath):
+            os.makedirs(excelPath)    
+        if not os.path.exists(autoexcelpath):
+            os.makedirs(autoexcelpath)    
+
+    def AutoSynchronize(self):
+        #获取当前时间并赋值
+        now_day = time.strftime("%Y-%m-%d", time.localtime())
+        if os.path.isfile(now_day+'.xls'):
+            data = xlrd.open_workbook(now_day+'.xls')
+            table = data.sheets()[0] 
+
+
+
 
     def LookDir(self):
         path = os.path.abspath(self.autoexcelpath)
