@@ -16,19 +16,19 @@ def printHeaders(headers):
         print(h+" : "+headers[h] + '\r\n')
 
 def getColorStyle(color):
-    colors = {
-        0 : None,
-        1 : 'yellow',
-        2 : 'blue',
-        3 : 'gray_ega',
-        4 : 'orange',
-        5 : 'dark_blue_ega',
-        6 : 'purple_ega',
-        7 : 'gray25',
-        8 : 'red',
-        9 : 'dark_red_ega',
-        10 : 'green'
-    }
+    # colors = {
+    #     0 : None,
+    #     1 : 'yellow',
+    #     2 : 'blue',
+    #     3 : 'gray_ega',
+    #     4 : 'orange',
+    #     5 : 'dark_blue_ega',
+    #     6 : 'purple_ega',
+    #     7 : 'gray25',
+    #     8 : 'red',
+    #     9 : 'dark_red_ega',
+    #     10 : 'green'
+    # }
 
 
     style = XFStyle()
@@ -40,7 +40,7 @@ def getColorStyle(color):
 
     pattern = Pattern()
     pattern.pattern = Pattern.SOLID_PATTERN
-    pattern.pattern_fore_colour = Style.colour_map[colors.get(color,None)]
+    #pattern.pattern_fore_colour = Style.colour_map[colors.get(color,None)]
     style.pattern = pattern
     return style
 

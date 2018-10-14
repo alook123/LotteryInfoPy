@@ -1,10 +1,12 @@
 import os
 import sys
 import time
+import datetime #导入日期时间模块
+import threading
 from PyQt5 import QtCore, QtGui, QtWidgets,uic
 from bs4 import BeautifulSoup
 from xlwt import *
-from xlrd import *
+import xlrd
 from common import get,getColorStyle
 from configparser import ConfigParser
 
@@ -17,33 +19,59 @@ cfg.read('config.ini')
 class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
     excelPath=''
     autoexcelpath=''
+    now_day = datetime.date.today() #获得今天的日期
+    today=str(now_day.year)+'-'+str(now_day.month)+'-'+str(now_day.day)
+    yesterday = now_day - datetime.timedelta(days=1)
+    yesterdayStr=str(yesterday.year)+'-'+str(yesterday.month)+'-'+str(yesterday.day)
+    beforeday = now_day - datetime.timedelta(days=2)
+    beforedayStr=str(beforeday.year)+'-'+str(beforeday.month)+'-'+str(beforeday.day)
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
         #获取当前时间并赋值
-        now_day = time.strftime("%Y-%m-%d", time.localtime())
-        self.dateEdit.setDate(QtCore.QDate.fromString(now_day, 'yyyy-MM-dd'))
+        #now_day = time.strftime("%Y-%m-%d", time.localtime())
+        now_day = datetime.date.today() #获得今天的日期
+        today=str(now_day.year)+'-'+str(now_day.month)+'-'+str(now_day.day)
+        self.dateEdit.setDate(QtCore.QDate.fromString(today, 'yyyy-MM-dd'))
         self.btnSetDir.clicked.connect(self.SetDir)
         self.btnAutoDir.clicked.connect(self.LookDir)
         self.btnManualOpen.clicked.connect(self.LookExcelByDate)
-        self.excelPath=cfg.get('path','excelPath')
-        self.autoexcelpath=cfg.get('path','autoexcelpath')
+        self.excelPath= path = os.path.abspath(cfg.get('path','excelPath'))
+        self.autoexcelpath=path = os.path.abspath(cfg.get('path','autoexcelpath'))
 
-        if not os.path.exists(excelPath):
-            os.makedirs(excelPath)    
-        if not os.path.exists(autoexcelpath):
-            os.makedirs(autoexcelpath)    
+        if not os.path.exists(self.excelPath):
+            os.makedirs(self.excelPath)    
+        if not os.path.exists(self.autoexcelpath):
+            os.makedirs(self.autoexcelpath)  
+
+        self.createExcel()
+        t = threading.Thread(target=self.AutoSynchronize)
+        t.start()
+        #self.AutoSynchronize()
 
     def AutoSynchronize(self):
-        #获取当前时间并赋值
-        now_day = time.strftime("%Y-%m-%d", time.localtime())
-        if os.path.isfile(now_day+'.xls'):
-            data = xlrd.open_workbook(now_day+'.xls')
-            table = data.sheets()[0] 
+        if not os.path.isfile(self.autoexcelpath+'\\'+self.yesterdayStr+'.xls'):
+            book = Workbook() #创建一个Excel
+            sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
+            book.save(self.autoexcelpath+'\\'+self.yesterdayStr+'.xls')
+            self.WriteExcel(self.yesterdayStr,self.autoexcelpath)
+        if not os.path.isfile(self.autoexcelpath+'\\'+self.beforedayStr+'.xls'):
+            book = Workbook() #创建一个Excel
+            sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
+            book.save(self.autoexcelpath+'\\'+self.beforedayStr+'.xls')
+            self.WriteExcel(self.beforedayStr,self.autoexcelpath)
+        while True:
+            self.WriteExcel(self.today,self.autoexcelpath)
+            time.sleep(60*5)
+        
+        
 
-
-
+    def createExcel(self):
+        if not os.path.isfile(self.autoexcelpath+'\\'+self.today+'.xls'):
+            book = Workbook() #创建一个Excel
+            sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
+            book.save(self.autoexcelpath+'\\'+self.today+'.xls')
 
     def LookDir(self):
         path = os.path.abspath(self.autoexcelpath)
@@ -57,17 +85,22 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
         with open("config.ini","w+") as f:
             cfg.write(f)
 
-    def LookExcelByDate(self):
-        #获取dateEdit的时间
-        yyyy = self.dateEdit.sectionText(self.dateEdit.sectionAt(0))
-        mm=self.dateEdit.sectionText(self.dateEdit.sectionAt(1))
-        dd=self.dateEdit.sectionText(self.dateEdit.sectionAt(2))
-        datestr=yyyy+'-'+mm+'-'+dd
+    def WriteExcel(self,datestr,filepath):
+        print("时间:"+str(datestr))
+        print("文件夹:"+str(datestr))
+        userstr=''
+        if not os.path.isfile(self.autoexcelpath+'\\'+self.beforedayStr+'.xls'):
+            data = xlrd.open_workbook(filepath+'\\'+datestr+'.xls')
+            table = data.sheets()[0] 
+            rows=table.nrows   #获取行数
+            cols=table.ncols    #获取列数
+            if rows > 0 :
+                userstr = table.row(0)[0].value
 
         book = Workbook() #创建一个Excel
         sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
 
-        sheet1.write_merge(0,2,0,11,'')
+        sheet1.write_merge(0,2,0,11,userstr)
 
         sheet1.write(3,0,'期数')
         sheet1.write(3,1,'时间')
@@ -96,11 +129,22 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
                 numstr+=item2.string.strip()
                 if item2.string.strip()!='':
                     listnum.append(item2.string.strip())
-                    style = getColorStyle(int(item2.string.strip()))
-                    sheet1.write(index+4,count+2,item2.string.strip(),style=style)
+                    #style = getColorStyle(int(item2.string.strip()))
+                    style1 = easyxf(num_format_str='0')#数据格式设置
+                    sheet1.write(index+4,count+2,int(item2.string.strip()),style=style1)
                     count+=1
-        book.save(self.excelPath+'/'+datestr+'.xls')
-        path = os.path.abspath(self.excelPath+'/'+datestr+'.xls')
+        print("保存路径:"+filepath+'\\'+datestr+'.xls')
+        book.save(filepath+'\\'+datestr+'.xls')
+
+    def LookExcelByDate(self):
+        #获取dateEdit的时间
+        yyyy = self.dateEdit.sectionText(self.dateEdit.sectionAt(0))
+        mm=self.dateEdit.sectionText(self.dateEdit.sectionAt(1))
+        dd=self.dateEdit.sectionText(self.dateEdit.sectionAt(2))
+        datestr=yyyy+'-'+mm+'-'+dd
+
+        self.WriteExcel(datestr,self.excelPath)
+        path = os.path.abspath(self.excelPath+'\\'+datestr+'.xls')
         os.startfile(path)
 
 if __name__ == "__main__":

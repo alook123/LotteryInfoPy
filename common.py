@@ -27,6 +27,6 @@ def getColorStyle(color):
     style.font = fnt  
     pattern = Pattern()
     pattern.pattern = Pattern.SOLID_PATTERN
-    pattern.pattern_fore_colour = Style.colour_map[colors.get(color,None)]
+    #pattern.pattern_fore_colour = Style.colour_map[colors.get(color,None)]
     style.pattern = pattern
     return style

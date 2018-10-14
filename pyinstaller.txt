@@ -1,0 +1,1 @@
+pyinstaller -w  --add-data=untitled.ui;.  --add-data=config.ini;.  LotteryMain.py
