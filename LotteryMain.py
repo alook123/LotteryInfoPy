@@ -51,6 +51,17 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
         #self.AutoSynchronize()
 
     def AutoSynchronize(self):
+<<<<<<< HEAD
+        if not os.path.isfile(self.autoexcelpath+'/'+self.yesterdayStr+'.xls'):
+            book = Workbook() #创建一个Excel
+            sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
+            book.save(self.autoexcelpath+'/'+self.yesterdayStr+'.xls')
+            self.WriteExcel(self.yesterdayStr,self.autoexcelpath)
+        if not os.path.isfile(self.autoexcelpath+'/'+self.beforedayStr+'.xls'):
+            book = Workbook() #创建一个Excel
+            sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
+            book.save(self.autoexcelpath+'/'+self.beforedayStr+'.xls')
+=======
         if not os.path.isfile(self.autoexcelpath+'\\'+self.yesterdayStr+'.xls'):
             book = Workbook() #创建一个Excel
             sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
@@ -60,6 +71,7 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
             book = Workbook() #创建一个Excel
             sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
             book.save(self.autoexcelpath+'\\'+self.beforedayStr+'.xls')
+>>>>>>> origin/master
             self.WriteExcel(self.beforedayStr,self.autoexcelpath)
         while True:
             self.WriteExcel(self.today,self.autoexcelpath)
@@ -68,10 +80,17 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
         
 
     def createExcel(self):
+<<<<<<< HEAD
+        if not os.path.isfile(self.autoexcelpath+'/'+self.today+'.xls'):
+            book = Workbook() #创建一个Excel
+            sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
+            book.save(self.autoexcelpath+'/'+self.today+'.xls')
+=======
         if not os.path.isfile(self.autoexcelpath+'\\'+self.today+'.xls'):
             book = Workbook() #创建一个Excel
             sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
             book.save(self.autoexcelpath+'\\'+self.today+'.xls')
+>>>>>>> origin/master
 
     def LookDir(self):
         path = os.path.abspath(self.autoexcelpath)
@@ -86,6 +105,15 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
             cfg.write(f)
 
     def WriteExcel(self,datestr,filepath):
+<<<<<<< HEAD
+        data = xlrd.open_workbook(filepath+'/'+datestr+'.xls')
+        table = data.sheets()[0] 
+        rows=table.nrows   #获取行数
+        cols=table.ncols    #获取列数
+        userstr=''
+        if rows > 0 :
+            userstr = table.row(0)[0].value
+=======
         print("时间:"+str(datestr))
         print("文件夹:"+str(datestr))
         userstr=''
@@ -96,6 +124,7 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
             cols=table.ncols    #获取列数
             if rows > 0 :
                 userstr = table.row(0)[0].value
+>>>>>>> origin/master
 
         book = Workbook() #创建一个Excel
         sheet1 = book.add_sheet('sheet1') #在其中创建一个sheet
@@ -133,8 +162,12 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
                     style1 = easyxf(num_format_str='0')#数据格式设置
                     sheet1.write(index+4,count+2,int(item2.string.strip()),style=style1)
                     count+=1
+<<<<<<< HEAD
+        book.save(filepath+'/'+datestr+'.xls')
+=======
         print("保存路径:"+filepath+'\\'+datestr+'.xls')
         book.save(filepath+'\\'+datestr+'.xls')
+>>>>>>> origin/master
 
     def LookExcelByDate(self):
         #获取dateEdit的时间
@@ -144,7 +177,11 @@ class MyApp(QtWidgets.QMainWindow, Ui_MainWindow):
         datestr=yyyy+'-'+mm+'-'+dd
 
         self.WriteExcel(datestr,self.excelPath)
+<<<<<<< HEAD
+        path = os.path.abspath(self.excelPath+'/'+datestr+'.xls')
+=======
         path = os.path.abspath(self.excelPath+'\\'+datestr+'.xls')
+>>>>>>> origin/master
         os.startfile(path)
 
 if __name__ == "__main__":
